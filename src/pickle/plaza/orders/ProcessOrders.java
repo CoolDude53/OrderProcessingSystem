@@ -25,23 +25,35 @@ public class ProcessOrders
     private void processOrder()
     {
         // get style number
-        System.out.print("Enter the style number (-1 to exit): ");
-        int styleNumber = 0;
-        try
-        {
-            styleNumber = Integer.parseInt(scanner.nextLine());
+        ArrayList<Integer> styleNumbers = new ArrayList<>();
+        System.out.print("Enter the style number(s) (-1 to exit): ");
 
-            if (styleNumber == -1)
+        String line = scanner.nextLine();
+        Scanner innerScanner = new Scanner(line);
+
+        while (innerScanner.hasNext())
+        {
+            int styleNumber;
+
+            try
             {
-                processor.close();
-                System.exit(0);
+                styleNumber = Integer.parseInt(innerScanner.next());
+
+                if (styleNumber == -1)
+                {
+                    processor.close();
+                    System.exit(0);
+                }
+
+            } catch (NumberFormatException e)
+            {
+                System.out.println("Improper input! Please start over.");
+                processOrder();
+                return;
             }
 
-        } catch (NumberFormatException e)
-        {
-            System.out.println("Improper input! Please start over.");
-            processOrder();
-            return;
+            System.out.println(styleNumber);
+            styleNumbers.add(styleNumber);
         }
 
         // get store name and create order
@@ -49,12 +61,17 @@ public class ProcessOrders
         Order order = new Order(scanner.nextLine().trim());
 
         // get sizes
-        System.out.print("Are there toddler size pickle.plaza.orders? (Y/N): ");
+        System.out.print("Are there toddler size orders? (Y/N): ");
         if (processSizes(scanner, order, scanner.nextLine().equalsIgnoreCase("Y")))
         {
             //add order to map
-            processor.getStyleMap().putIfAbsent(styleNumber, new ArrayList<>());
-            processor.getStyleMap().get(styleNumber).add(order);
+            for (int number : styleNumbers)
+            {
+                processor.getStyleMap().putIfAbsent(number, new ArrayList<>());
+                processor.getStyleMap().get(number).add(order);
+            }
+
+            System.out.println(processor.getStyleMap().size());
 
             System.out.print("Is there another product to be inputted? (Y/N): ");
             if (scanner.next().equalsIgnoreCase("Y"))

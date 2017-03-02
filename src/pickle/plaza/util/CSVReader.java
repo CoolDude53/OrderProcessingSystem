@@ -22,7 +22,9 @@ public class CSVReader
             if (file.exists())
             {
                 Scanner scanner = new Scanner(file);
-                scanner.nextLine();
+                if (scanner.hasNextLine())
+                    scanner.nextLine();
+
                 while (scanner.hasNext())
                 {
                     List<String> line = parseLine(scanner.nextLine());
